@@ -10,6 +10,10 @@ import { useEditorStore } from "../store/editorStore";
 
 export default function ViewerScreen() {
   const selected = useDocumentStore((s) => s.selectedDoc());
+
+  // ✅ ADD THIS LINE (this was missing)
+  const tool = useEditorStore((s) => s.tool);
+
   const page = useEditorStore((s) => s.page);
   const total = useEditorStore((s) => s.totalPages);
 
@@ -19,9 +23,9 @@ export default function ViewerScreen() {
     <View style={styles.wrap}>
       <ViewerHeader title={title} onBack={() => {}} />
 
-      {/* If a picked PDF exists -> render real PDF */}
       {selected?.fileType === "pdf" && selected?.uri ? (
-        <PDFWebView uri={selected.uri} />
+        // ✅ Now tool exists
+        <PDFWebView uri={selected.uri} tool={tool} />
       ) : (
         <PDFCanvas total={total} activePage={page} />
       )}

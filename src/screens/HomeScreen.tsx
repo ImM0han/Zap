@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { View, StyleSheet, ScrollView, Alert } from "react-native";
 import { colors } from "../utils/theme";
@@ -15,11 +16,11 @@ export default function HomeScreen() {
   const addMockDoc = useDocumentStore((s) => s.addMockDoc);
   const pickPdfAndAdd = useDocumentStore((s) => s.pickPdfAndAdd);
 const selectDoc = useDocumentStore((s) => s.selectDoc);
-
+const navigation = useNavigation<any>();
 
   const openDoc = (id: string) => {
   selectDoc(id);
-  // Switch tab manually by user for now (no navigation jump yet).
+  navigation.navigate("Viewer");
 };
 
   return (
@@ -44,7 +45,10 @@ const selectDoc = useDocumentStore((s) => s.selectDoc);
       </ScrollView>
 
       <FAB
-  onAddPdf={() => pickPdfAndAdd()}   // ✅ pick real pdf
+ onAddPdf={async () => {
+  await pickPdfAndAdd();
+  navigation.navigate("Viewer");
+}}
   onAddDocx={() => addMockDoc("docx")}
   onAddPptx={() => addMockDoc("pptx")}
 />
