@@ -1,18 +1,58 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { colors, font } from "../utils/theme";
+import { View, StyleSheet, ScrollView, Alert } from "react-native";
+import { colors } from "../utils/theme";
+import HomeHeader from "../components/Home/HomeHeader";
+import QuickChips from "../components/Home/QuickChips";
+import SectionRow from "../components/Common/SectionRow";
+import RecentCarousel from "../components/Home/RecentCarousel";
+import FileList from "../components/Home/FileList";
+import FAB from "../components/Home/FAB";
+import { useDocumentStore } from "../store/documentStore";
 
 export default function HomeScreen() {
+  const recent = useDocumentStore((s) => s.recent);
+  const docs = useDocumentStore((s) => s.docs);
+  const addMockDoc = useDocumentStore((s) => s.addMockDoc);
+  const pickPdfAndAdd = useDocumentStore((s) => s.pickPdfAndAdd);
+const selectDoc = useDocumentStore((s) => s.selectDoc);
+
+
+  const openDoc = (id: string) => {
+  selectDoc(id);
+  // Switch tab manually by user for now (no navigation jump yet).
+};
+
   return (
-    <View style={styles.wrap}>
-      <Text style={styles.title}>DocZap</Text>
-      <Text style={styles.sub}>Home (Phase 2 will build the full UI)</Text>
+    <View style={styles.page}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <HomeHeader />
+
+        <QuickChips
+          onScan={() => Alert.alert("Scan", "Go to Scanner tab (Phase 5 will implement)")}
+          onView={() => Alert.alert("View", "Open Viewer tab (Phase 3 will implement)")}
+          onMerge={() => Alert.alert("Merge", "Open Merge tab (Phase 4 will implement)")}
+          onExport={() => Alert.alert("Export", "Phase 6 will implement export")}
+        />
+
+        <SectionRow title="Recent Files" actionLabel="See all" onAction={() => {}} />
+        <RecentCarousel items={recent} onOpen={openDoc} />
+
+        <SectionRow title="All Files" />
+        <FileList items={docs} onOpen={openDoc} />
+
+        <View style={{ height: 120 }} />
+      </ScrollView>
+
+      <FAB
+  onAddPdf={() => pickPdfAndAdd()}   // ✅ pick real pdf
+  onAddDocx={() => addMockDoc("docx")}
+  onAddPptx={() => addMockDoc("pptx")}
+/>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: colors.bg, padding: 16 },
-  title: { fontFamily: font.title, fontSize: 26, color: colors.text },
-  sub: { marginTop: 8, fontFamily: font.body, color: colors.muted },
+  page: { flex: 1, backgroundColor: colors.bg },
+  content: { padding: 16, paddingBottom: 24 },
 });

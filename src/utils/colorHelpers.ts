@@ -19,6 +19,12 @@ export function fileTypeChipBg(t: FileType) {
   return "#FFF8D6";
 }
 
+export function fileTypeBadgeBg(t: FileType) {
+  if (t === "pdf") return "#FFE8E8";
+  if (t === "docx") return "#E0F7F6";
+  return "#FFF8D6";
+}
+
 export function fileTypeAccent(t: FileType) {
   if (t === "pdf") return colors.coral;
   if (t === "docx") return colors.sky;
@@ -26,7 +32,6 @@ export function fileTypeAccent(t: FileType) {
 }
 
 export function fileTypeGradient(t: FileType) {
-  // Expo LinearGradient colors
   if (t === "pdf") return ["#FFE8E8", "#FFCECE"];
   if (t === "docx") return ["#E0F7F6", "#B2EBE8"];
   return ["#FFF8D6", "#FFE97A"];

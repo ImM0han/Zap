@@ -1,11 +1,17 @@
 import { create } from "zustand";
 import type { DocItem, FileType } from "../types/document.types";
+import * as DocumentPicker from "expo-document-picker";
 
 type DocumentState = {
   docs: DocItem[];
   recent: DocItem[];
 
+  selectedId: string | null;
+  selectDoc: (id: string) => void;
+  selectedDoc: () => DocItem | null;
+
   addMockDoc: (fileType: FileType) => void;
+  pickPdfAndAdd: () => Promise<void>;
 };
 
 const nowIso = () => new Date().toISOString();
@@ -22,6 +28,14 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
   docs: seedDocs,
   recent: seedDocs.slice(0, 3),
 
+  selectedId: seedDocs[0]?.id ?? null,
+  selectDoc: (id) => set({ selectedId: id }),
+  selectedDoc: () => {
+    const id = get().selectedId;
+    if (!id) return null;
+    return get().docs.find((d) => d.id === id) ?? null;
+  },
+
   addMockDoc: (fileType) => {
     const id = String(Date.now());
     const doc: DocItem = {
@@ -33,8 +47,39 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       uploadedAt: nowIso(),
     };
 
-    const docs = [doc, ...get().docs];
-    const recent = [doc, ...get().recent].slice(0, 6);
-    set({ docs, recent });
+    set((s) => ({
+      docs: [doc, ...s.docs],
+      recent: [doc, ...s.recent].slice(0, 6),
+      selectedId: doc.id,
+    }));
+  },
+
+  pickPdfAndAdd: async () => {
+    const res = await DocumentPicker.getDocumentAsync({
+      type: "application/pdf",
+      copyToCacheDirectory: true,
+      multiple: false,
+    });
+
+    if (res.canceled) return;
+
+    const a = res.assets?.[0];
+    if (!a) return;
+
+    const id = String(Date.now());
+    const doc: DocItem = {
+      id,
+      filename: a.name || `Picked-${id}.pdf`,
+      fileType: "pdf",
+      fileSize: a.size ?? 0,
+      uploadedAt: nowIso(),
+      uri: a.uri,
+    };
+
+    set((s) => ({
+      docs: [doc, ...s.docs],
+      recent: [doc, ...s.recent].slice(0, 6),
+      selectedId: doc.id,
+    }));
   },
 }));

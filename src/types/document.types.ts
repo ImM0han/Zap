@@ -6,4 +6,5 @@ export type DocItem = {
   fileType: FileType;
   fileSize: number; // bytes
   uploadedAt: string; // ISO string
+  uri?: string;       // local file uri (picked file)
 };
